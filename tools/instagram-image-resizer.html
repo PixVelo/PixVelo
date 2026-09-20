@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Instagram Image Resizer – Sherox</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="../index.html"><span class="logo">S</span>Sherox</a>
+      <nav class="navlinks">
+        <a href="../index.html#tools">All Tools</a>
+        <a href="image-compressor.html">Compressor</a>
+        <a href="image-resizer.html">Resizer</a>
+        <a href="jpg-to-webp.html">Converters</a>
+        <a href="image-cropper.html">Cropper</a>
+      </nav>
+      <button class="menu" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <main class="tool-page">
+    <div class="container">
+      <div class="tool-header">
+        <h1>Instagram Image Resizer</h1>
+        <p>Resize images using common square, portrait and landscape presets often used for social posts. Not official Instagram requirements.</p>
+      </div>
+
+      <div class="tool-layout">
+        <div class="tool-main">
+          <div class="tool-drop" id="dropzone">
+            <div class="upload-icon">↑</div>
+            <h2>Drop image here or click to upload</h2>
+            <p class="muted">JPG, PNG, WebP</p>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <button class="btn primary" id="uploadBtn" style="margin-top:12px">Choose Image</button>
+            <div class="example-row">
+              <button type="button" class="btn example" id="exampleBtn">✨ Try an example</button>
+            </div>
+          </div>
+          <div class="tool-preview-area" id="previewArea">
+            <div class="preview-box"><img id="previewImg" alt="Preview"></div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <h3>Presets</h3>
+          <div class="stats" id="stats" style="display:none">
+            <div><span class="label">Original</span><span class="value" id="origDims">—</span></div>
+            <div><span class="label">Output</span><span class="value" id="outDims">—</span></div>
+            <div><span class="label">File size</span><span class="value" id="fileSize">—</span></div>
+          </div>
+
+          <div class="control-group">
+            <label>Choose preset</label>
+            <select id="preset">
+              <option value="1080x1080">Square Post (1080×1080)</option>
+              <option value="1080x1350">Portrait Post (1080×1350)</option>
+              <option value="1080x566">Landscape (1080×566)</option>
+              <option value="1080x1920">Story / Reel (1080×1920)</option>
+              <option value="320x320">Profile Photo (320×320)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label>Fit mode</label>
+            <select id="fit">
+              <option value="cover">Cover (crop to fill)</option>
+              <option value="contain">Contain (fit inside, may letterbox)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label>Background (for contain)</label>
+            <input type="color" id="bgColor" value="#000000" style="width:100%;height:40px;border:none;border-radius:8px;cursor:pointer">
+          </div>
+
+          <div class="control-group">
+            <label>Quality: <span id="qualityVal">90</span>%</label>
+            <input type="range" id="quality" min="1" max="100" value="90">
+          </div>
+
+          <button class="btn primary btn-block" id="processBtn" disabled>Resize Image</button>
+          <button class="btn secondary btn-block" id="downloadBtn" disabled>Download</button>
+          <button class="btn secondary btn-block" id="resetBtn">Reset</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container copyright">Developed by Sherox</div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const dropzone = document.getElementById("dropzone");
+    const previewArea = document.getElementById("previewArea");
+    const previewImg = document.getElementById("previewImg");
+    const processBtn = document.getElementById("processBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const preset = document.getElementById("preset");
+    const fit = document.getElementById("fit");
+    const bgColor = document.getElementById("bgColor");
+    const quality = document.getElementById("quality");
+    const qualityVal = document.getElementById("qualityVal");
+    const stats = document.getElementById("stats");
+
+    let originalFile = null, originalImg = null, resultBlob = null;
+    quality.addEventListener("input", () => qualityVal.textContent = quality.value);
+
+    function showImage(file) {
+      loadImageFromFile(file).then(img => {
+        originalFile = file; originalImg = img;
+        previewImg.src = img.src;
+        dropzone.classList.add("hidden"); previewArea.classList.add("show");
+        processBtn.disabled = false; downloadBtn.disabled = true; resultBlob = null;
+        document.getElementById("origDims").textContent = img.width + " × " + img.height;
+        document.getElementById("outDims").textContent = "—";
+        document.getElementById("fileSize").textContent = formatBytes(file.size);
+        stats.style.display = "block";
+      }).catch(err => alert(err.message));
+    }
+
+    document.getElementById("uploadBtn").addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", e => e.target.files[0] && showImage(e.target.files[0]));
+    ["dragenter","dragover"].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.add("drag"); }));
+    ["dragleave","drop"].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.remove("drag"); }));
+    dropzone.addEventListener("drop", e => e.dataTransfer.files[0] && showImage(e.dataTransfer.files[0]));
+
+    processBtn.addEventListener("click", async () => {
+      if (!originalImg) return;
+      const [tw, th] = preset.value.split("x").map(Number);
+      processBtn.disabled = true; processBtn.textContent = "Processing…";
+
+      const canvas = document.createElement("canvas");
+      canvas.width = tw; canvas.height = th;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = bgColor.value;
+      ctx.fillRect(0, 0, tw, th);
+
+      const srcW = originalImg.width;
+      const srcH = originalImg.height;
+      let dx, dy, dw, dh;
+
+      if (fit.value === "cover") {
+        const scale = Math.max(tw / srcW, th / srcH);
+        dw = srcW * scale; dh = srcH * scale;
+        dx = (tw - dw) / 2; dy = (th - dh) / 2;
+      } else {
+        const scale = Math.min(tw / srcW, th / srcH);
+        dw = srcW * scale; dh = srcH * scale;
+        dx = (tw - dw) / 2; dy = (th - dh) / 2;
+      }
+
+      ctx.drawImage(originalImg, dx, dy, dw, dh);
+      resultBlob = await canvasToBlob(canvas, "image/jpeg", quality.value / 100);
+
+      document.getElementById("outDims").textContent = tw + " × " + th;
+      document.getElementById("fileSize").textContent = formatBytes(resultBlob.size);
+      previewImg.src = URL.createObjectURL(resultBlob);
+      downloadBtn.disabled = false;
+      processBtn.disabled = false; processBtn.textContent = "Resize Image";
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!resultBlob) return;
+      const name = (originalFile.name.replace(/\.[^.]+$/, "") || "instagram") + "_" + preset.value + ".jpg";
+      downloadBlob(resultBlob, name);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      originalFile = null; originalImg = null; resultBlob = null;
+      fileInput.value = ""; previewImg.src = "";
+      dropzone.classList.remove("hidden"); previewArea.classList.remove("show");
+      processBtn.disabled = true; downloadBtn.disabled = true; stats.style.display = "none";
+      processBtn.textContent = "Resize Image";
+    });
+  
+    const exampleBtn = document.getElementById("exampleBtn");
+    if (exampleBtn) {
+      exampleBtn.addEventListener("click", async () => {
+        try {
+          exampleBtn.disabled = true;
+          exampleBtn.textContent = "Loading…";
+          const file = await loadSampleAsFile("square");
+          showImage(file);
+        } catch (err) {
+          alert(err.message || "Could not load example");
+        } finally {
+          exampleBtn.disabled = false;
+          exampleBtn.textContent = "✨ Try an example";
+        }
+      });
+    }
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Image Compressor – Sherox</title>
+  <meta name="description" content="Compress JPG, PNG and WebP images online for free. Browser-side processing.">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="../index.html"><span class="logo">S</span>Sherox</a>
+      <nav class="navlinks">
+        <a href="../index.html#tools">All Tools</a>
+        <a href="image-compressor.html">Compressor</a>
+        <a href="image-resizer.html">Resizer</a>
+        <a href="jpg-to-webp.html">Converters</a>
+        <a href="image-cropper.html">Cropper</a>
+      </nav>
+      <button class="menu" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <main class="tool-page">
+    <div class="container">
+      <div class="tool-header">
+        <h1>Image Compressor</h1>
+        <p>Reduce file size of JPG, PNG and WebP images. All processing happens in your browser — nothing is uploaded.</p>
+      </div>
+
+      <div class="tool-layout">
+        <div class="tool-main">
+          <div class="tool-drop" id="dropzone">
+            <div class="upload-icon">↑</div>
+            <h2>Drop image here or click to upload</h2>
+            <p class="muted">JPG, PNG, WebP, GIF</p>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <button class="btn primary" id="uploadBtn" style="margin-top:12px">Choose Image</button>
+            <div class="example-row">
+              <button type="button" class="btn example" id="exampleBtn">✨ Try an example</button>
+            </div>
+          </div>
+
+          <div class="tool-preview-area" id="previewArea">
+            <div class="preview-box">
+              <img id="previewImg" alt="Preview">
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <h3>Settings</h3>
+
+          <div class="stats" id="stats" style="display:none">
+            <div><span class="label">Original</span><span class="value" id="origSize">—</span></div>
+            <div><span class="label">Compressed</span><span class="value" id="newSize">—</span></div>
+            <div><span class="label">Saved</span><span class="value" id="saved">—</span></div>
+            <div><span class="label">Dimensions</span><span class="value" id="dims">—</span></div>
+          </div>
+
+          <div class="control-group">
+            <label>Output Format</label>
+            <select id="format">
+              <option value="image/jpeg">JPG</option>
+              <option value="image/webp">WebP</option>
+              <option value="image/png">PNG</option>
+            </select>
+          </div>
+
+          <div class="control-group" id="qualityGroup">
+            <label>Quality: <span id="qualityVal">80</span>%</label>
+            <input type="range" id="quality" min="1" max="100" value="80">
+            <div class="range-value"><span>Smaller</span><span>Better quality</span></div>
+          </div>
+
+          <div class="control-group">
+            <label>Max Width (optional)</label>
+            <input type="number" id="maxWidth" placeholder="Keep original" min="1">
+          </div>
+
+          <div class="control-group">
+            <label>Max Height (optional)</label>
+            <input type="number" id="maxHeight" placeholder="Keep original" min="1">
+          </div>
+
+          <button class="btn primary btn-block" id="processBtn" disabled>Compress Image</button>
+          <button class="btn secondary btn-block" id="downloadBtn" disabled>Download</button>
+          <button class="btn secondary btn-block" id="resetBtn">Reset</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container copyright">Developed by Sherox · Free browser-side image tools</div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const dropzone = document.getElementById("dropzone");
+    const previewArea = document.getElementById("previewArea");
+    const previewImg = document.getElementById("previewImg");
+    const processBtn = document.getElementById("processBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const quality = document.getElementById("quality");
+    const qualityVal = document.getElementById("qualityVal");
+    const format = document.getElementById("format");
+    const maxWidth = document.getElementById("maxWidth");
+    const maxHeight = document.getElementById("maxHeight");
+    const stats = document.getElementById("stats");
+    const qualityGroup = document.getElementById("qualityGroup");
+
+    let originalFile = null;
+    let originalImg = null;
+    let resultBlob = null;
+
+    quality.addEventListener("input", () => {
+      qualityVal.textContent = quality.value;
+    });
+
+    format.addEventListener("change", () => {
+      qualityGroup.style.display = format.value === "image/png" ? "none" : "block";
+    });
+
+    function showImage(file) {
+      loadImageFromFile(file).then(img => {
+        originalFile = file;
+        originalImg = img;
+        previewImg.src = img.src;
+        dropzone.classList.add("hidden");
+        previewArea.classList.add("show");
+        processBtn.disabled = false;
+        downloadBtn.disabled = true;
+        resultBlob = null;
+
+        document.getElementById("origSize").textContent = formatBytes(file.size);
+        document.getElementById("dims").textContent = img.width + " × " + img.height;
+        document.getElementById("newSize").textContent = "—";
+        document.getElementById("saved").textContent = "—";
+        stats.style.display = "block";
+      }).catch(err => alert(err.message));
+    }
+
+    document.getElementById("uploadBtn").addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", e => e.target.files[0] && showImage(e.target.files[0]));
+
+    ["dragenter","dragover"].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.add("drag"); }));
+    ["dragleave","drop"].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.remove("drag"); }));
+    dropzone.addEventListener("drop", e => e.dataTransfer.files[0] && showImage(e.dataTransfer.files[0]));
+
+    processBtn.addEventListener("click", async () => {
+      if (!originalImg) return;
+      processBtn.disabled = true;
+      processBtn.textContent = "Processing…";
+
+      let w = originalImg.width;
+      let h = originalImg.height;
+      const mw = parseInt(maxWidth.value) || 0;
+      const mh = parseInt(maxHeight.value) || 0;
+
+      if (mw > 0 && w > mw) {
+        h = Math.round(h * (mw / w));
+        w = mw;
+      }
+      if (mh > 0 && h > mh) {
+        w = Math.round(w * (mh / h));
+        h = mh;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+
+      // White background for JPG if source has transparency
+      if (format.value === "image/jpeg") {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+      }
+      ctx.drawImage(originalImg, 0, 0, w, h);
+
+      const q = format.value === "image/png" ? undefined : quality.value / 100;
+      resultBlob = await canvasToBlob(canvas, format.value, q);
+
+      document.getElementById("newSize").textContent = formatBytes(resultBlob.size);
+      const saved = originalFile.size - resultBlob.size;
+      const pct = originalFile.size > 0 ? Math.round((saved / originalFile.size) * 100) : 0;
+      document.getElementById("saved").textContent = formatBytes(saved) + " (" + pct + "%)";
+      document.getElementById("dims").textContent = w + " × " + h;
+
+      // Show compressed preview
+      previewImg.src = URL.createObjectURL(resultBlob);
+
+      downloadBtn.disabled = false;
+      processBtn.disabled = false;
+      processBtn.textContent = "Compress Image";
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!resultBlob) return;
+      const ext = format.value === "image/jpeg" ? "jpg" : format.value === "image/webp" ? "webp" : "png";
+      const name = (originalFile.name.replace(/\.[^.]+$/, "") || "compressed") + "." + ext;
+      downloadBlob(resultBlob, name);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      originalFile = null;
+      originalImg = null;
+      resultBlob = null;
+      fileInput.value = "";
+      previewImg.src = "";
+      dropzone.classList.remove("hidden");
+      previewArea.classList.remove("show");
+      processBtn.disabled = true;
+      downloadBtn.disabled = true;
+      stats.style.display = "none";
+      processBtn.textContent = "Compress Image";
+    });
+  
+    const exampleBtn = document.getElementById("exampleBtn");
+    if (exampleBtn) {
+      exampleBtn.addEventListener("click", async () => {
+        try {
+          exampleBtn.disabled = true;
+          exampleBtn.textContent = "Loading…";
+          const file = await loadSampleAsFile("photo");
+          showImage(file);
+        } catch (err) {
+          alert(err.message || "Could not load example");
+        } finally {
+          exampleBtn.disabled = false;
+          exampleBtn.textContent = "✨ Try an example";
+        }
+      });
+    }
+
+  </script>
+</body>
+</html>

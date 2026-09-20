@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PixVelo – Free Image Tools</title>
+  <meta name="description" content="Free online image tools to resize, compress, convert and crop images directly in your browser.">
+  <meta property="og:title" content="Sherox – Free Image Tools">
+  <meta property="og:description" content="Resize, compress, convert, and edit images online for free.">
+  <link rel="canonical" href="https://example.com/">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="index.html"><span class="logo">P</span>PixVelo</a>
+      <nav class="navlinks">
+        <a href="index.html#tools">All Tools</a>
+        <a href="tools/image-compressor.html">Compressor</a>
+        <a href="tools/image-resizer.html">Resizer</a>
+        <a href="tools/jpg-to-webp.html">Converters</a>
+        <a href="tools/image-cropper.html">Cropper</a>
+      </nav>
+      <button class="menu" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="container">
+        <div class="eyebrow">Fast · Free · Private · Simple</div>
+        <h1>Free Image Tools. Simple. Fast. Private.</h1>
+        <p>Resize, compress, convert, and edit your images online for free — directly in your browser. No uploads to any server.</p>
+
+        <section class="workspace">
+          <div class="tabs">
+            <button class="tab active" data-tool="resizer">Resize</button>
+            <button class="tab" data-tool="compressor">Compress</button>
+            <button class="tab" data-tool="cropper">Crop</button>
+          </div>
+
+          <div class="dropzone" id="dropzone">
+            <div>
+              <div class="upload-icon">↑</div>
+              <h2>Drop or paste your image here</h2>
+              <p class="muted">JPG, PNG, WebP, GIF</p>
+              <input id="fileInput" type="file" accept="image/*" hidden>
+              <button class="btn primary" id="uploadBtn">Upload Image</button>
+              <div class="example-row">
+                <button type="button" class="btn example" id="exampleBtn">✨ Try an example</button>
+              </div>
+              <div class="small muted">Browser-side processing · Your files never leave your device</div>
+            </div>
+          </div>
+
+          <div class="editor" id="editor">
+            <div class="preview-wrap">
+              <div class="preview">
+                <img id="imagePreview" alt="Uploaded image preview">
+              </div>
+              <div class="panel">
+                <div class="status show success" id="status">Image loaded. Open a tool below for full controls.</div>
+                <div class="actions">
+                  <a class="btn primary" id="openToolBtn" href="tools/image-resizer.html">Open Resizer</a>
+                  <a class="btn secondary" href="tools/image-compressor.html">Open Compressor</a>
+                  <button class="btn secondary" id="resetBtn">Reset</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="section" id="tools">
+      <div class="container">
+        <h2>Popular image tools</h2>
+        <p class="section-intro">Useful browser-based tools for everyday image editing, optimization and conversion.</p>
+        <div class="tool-grid">
+          <article class="card">
+            <div class="card-icon">🗜️</div>
+            <h3>Image Compressor</h3>
+            <p>Compress JPG, PNG and WebP images with a quality control and size comparison.</p>
+            <a class="open" href="tools/image-compressor.html">Open tool →</a>
+          </article>
+          <article class="card">
+            <div class="card-icon">📦</div>
+            <h3>Compress Image to 100KB</h3>
+            <p>Try to reduce an image to approximately 100KB without pretending an exact target is always possible.</p>
+            <a class="open" href="tools/compress-image-to-100kb.html">Open tool →</a>
+          </article>
+          <article class="card">
+            <div class="card-icon">📉</div>
+            <h3>Compress Image to 200KB</h3>
+            <p>Try to reduce an image to approximately 200KB with a simple browser workflow.</p>
+            <a class="open" href="tools/compress-image-to-200kb.html">Open tool →</a>
+          </article>
+          <article class="card">
+            <div class="card-icon">📐</div>
+            <h3>Image Resizer</h3>
+            <p>Resize images to custom dimensions or practical presets.</p>
+            <a class="open" href="tools/image-resizer.html">Open tool →</a>
+          </article>
+          <article class="card">
+            <div class="card-icon">🔄</div>
+            <h3>JPG to WebP</h3>
+            <p>Convert JPG and JPEG images to WebP in your browser.</p>
+            <a class="open" href="tools/jpg-to-webp.html">Open tool →</a>
+          </article>
+          <article class="card">
+            <div class="card-icon">🖼️</div>
+            <h3>PNG to WebP</h3>
+            <p>Convert PNG images to WebP while preserving transparency where supported.</p>
+            <a class="open" href="tools/png-to-webp.html">Open tool →</a>
+          </article>
+          <article class="card">
+            <div class="card-icon">📷</div>
+            <h3>WebP to JPG</h3>
+            <p>Convert WebP images to JPG with a selectable background for transparency.</p>
+            <a class="open" href="tools/webp-to-jpg.html">Open tool →</a>
+          </article>
+          <article class="card">
+            <div class="card-icon">✂️</div>
+            <h3>Image Cropper</h3>
+            <p>Crop images using common aspect ratios and download the result.</p>
+            <a class="open" href="tools/image-cropper.html">Open tool →</a>
+          </article>
+          <article class="card">
+            <div class="card-icon">🎞️</div>
+            <h3>Image to JPG</h3>
+            <p>Convert compatible images to JPG with quality and background controls.</p>
+            <a class="open" href="tools/image-to-jpg.html">Open tool →</a>
+          </article>
+          <article class="card">
+            <div class="card-icon">📱</div>
+            <h3>Instagram Image Resizer</h3>
+            <p>Resize using square, portrait and landscape presets without claiming official requirements.</p>
+            <a class="open" href="tools/instagram-image-resizer.html">Open tool →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="container">
+        <h2>Built around four simple ideas</h2>
+        <div class="cards">
+          <article class="card">
+            <div class="card-icon">⚡</div>
+            <h3>Fast</h3>
+            <p>Process supported images locally in your browser without unnecessary upload steps.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">◉</div>
+            <h3>Private</h3>
+            <p>Images stay on your device. All processing happens client-side.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">✓</div>
+            <h3>Free</h3>
+            <p>Core image tools work without a payment wall or required account.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">✦</div>
+            <h3>Easy</h3>
+            <p>Clear controls designed for beginners and everyday creative work.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2>How it works</h2>
+        <div class="steps">
+          <div class="step">
+            <span class="num">1</span>
+            <div><b>Upload your image</b><p class="muted">Choose a file or drag it into the workspace.</p></div>
+          </div>
+          <div class="step">
+            <span class="num">2</span>
+            <div><b>Choose your settings</b><p class="muted">Pick a tool and adjust the controls you need.</p></div>
+          </div>
+          <div class="step">
+            <span class="num">3</span>
+            <div><b>Download your result</b><p class="muted">Save the processed image directly to your device.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="container copy">
+        <article>
+          <h2>Why compress images?</h2>
+          <p>Smaller image files can be easier to upload, share and store. Compression can reduce file size while balancing visual quality.</p>
+          <h2>Why resize images?</h2>
+          <p>Different websites and documents often need different dimensions. Resizing creates a more suitable image for the intended use.</p>
+        </article>
+        <article>
+          <h2>Why convert formats?</h2>
+          <p>JPG, PNG and WebP have different strengths. Conversion can help match an image to a workflow or storage goal.</p>
+          <h2>Why browser-based tools?</h2>
+          <p>For supported operations, browser processing means your images never need to leave your device.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2>Frequently asked questions</h2>
+        <div class="faq">
+          <details>
+            <summary>What is an image compressor?</summary>
+            <p>A compressor reduces an image's file size by changing encoding settings and, depending on the tool, dimensions or quality.</p>
+          </details>
+          <details>
+            <summary>How do I resize an image?</summary>
+            <p>Open the Image Resizer, upload an image, enter dimensions or choose a preset, then process and download.</p>
+          </details>
+          <details>
+            <summary>How can I compress an image to 100KB?</summary>
+            <p>The 100KB tool searches for an approximate result. Some images cannot reach an exact target without substantial quality loss.</p>
+          </details>
+          <details>
+            <summary>Does compression reduce quality?</summary>
+            <p>It can. Lossy compression trades some image information for smaller files.</p>
+          </details>
+          <details>
+            <summary>What formats are supported?</summary>
+            <p>The tools accept JPG/JPEG, PNG, WebP and GIF as inputs where supported. Output formats vary by tool.</p>
+          </details>
+          <details>
+            <summary>Are these tools free?</summary>
+            <p>The core tools are designed to work without an account or payment step.</p>
+          </details>
+          <details>
+            <summary>Are uploaded images stored?</summary>
+            <p>No. All processing happens in your browser. Images never leave your device.</p>
+          </details>
+          <details>
+            <summary>Can I use these tools on my phone?</summary>
+            <p>Yes. The interface is responsive and designed for touch-friendly use.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <section class="cta">
+        <h2>Simple tools for everyday image tasks</h2>
+        <p>Built for creators, students, businesses and everyday users.</p>
+        <a class="btn primary" href="#tools">Explore all tools</a>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <h3>PixVelo</h3>
+        <p>Free online image tools for everyday image editing and optimization.</p>
+      </div>
+      <div>
+        <h3>Tools</h3>
+        <a href="tools/image-compressor.html">Image Compressor</a>
+        <a href="tools/image-resizer.html">Image Resizer</a>
+        <a href="tools/jpg-to-webp.html">JPG to WebP</a>
+        <a href="tools/png-to-webp.html">PNG to WebP</a>
+        <a href="tools/webp-to-jpg.html">WebP to JPG</a>
+        <a href="tools/image-cropper.html">Image Cropper</a>
+      </div>
+      <div>
+        <h3>Company</h3>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="faq.html">FAQ</a>
+      </div>
+      <div>
+        <h3>Legal</h3>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Use</a>
+        <a href="cookie-policy.html">Cookie Policy</a>
+      </div>
+    </div>
+    <div class="container copyright">Developed by PixVelo</div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const fileInput = document.getElementById("fileInput");
+      const dropzone = document.getElementById("dropzone");
+      const editor = document.getElementById("editor");
+      const preview = document.getElementById("imagePreview");
+      const status = document.getElementById("status");
+      const openToolBtn = document.getElementById("openToolBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const tabs = document.querySelectorAll(".tab");
+
+      let currentTool = "resizer";
+      const toolLinks = {
+        resizer: "tools/image-resizer.html",
+        compressor: "tools/image-compressor.html",
+        cropper: "tools/image-cropper.html"
+      };
+
+      tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          tabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          currentTool = tab.dataset.tool;
+          openToolBtn.href = toolLinks[currentTool];
+          openToolBtn.textContent = "Open " + tab.textContent;
+        });
+      });
+
+      function loadFile(file) {
+        if (!file || !file.type.startsWith("image/")) {
+          status.className = "status show error";
+          status.textContent = "Please select a valid image file.";
+          return;
+        }
+        preview.src = URL.createObjectURL(file);
+        dropzone.style.display = "none";
+        editor.classList.add("show");
+        status.className = "status show success";
+        status.textContent = "Image loaded. Open a tool below for full controls.";
+        openToolBtn.href = toolLinks[currentTool];
+      }
+
+      uploadBtn.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", e => e.target.files[0] && loadFile(e.target.files[0]));
+
+      ["dragenter", "dragover"].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+          e.preventDefault();
+          dropzone.classList.add("drag");
+        });
+      });
+      ["dragleave", "drop"].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+          e.preventDefault();
+          dropzone.classList.remove("drag");
+        });
+      });
+      dropzone.addEventListener("drop", e => {
+        e.dataTransfer.files[0] && loadFile(e.dataTransfer.files[0]);
+      });
+
+      // Paste support
+      document.addEventListener("paste", e => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+        for (const item of items) {
+          if (item.type.startsWith("image/")) {
+            loadFile(item.getAsFile());
+            break;
+          }
+        }
+      });
+
+      
+      const exampleBtn = document.getElementById("exampleBtn");
+      if (exampleBtn) {
+        exampleBtn.addEventListener("click", async () => {
+          try {
+            exampleBtn.disabled = true;
+            exampleBtn.textContent = "Loading…";
+            const file = await loadSampleAsFile("photo");
+            loadFile(file);
+          } catch (err) {
+            alert(err.message || "Could not load example");
+          } finally {
+            exampleBtn.disabled = false;
+            exampleBtn.textContent = "✨ Try an example";
+          }
+        });
+      }
+
+      resetBtn.addEventListener("click", () => {
+        editor.classList.remove("show");
+        dropzone.style.display = "block";
+        preview.src = "";
+        fileInput.value = "";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Image to JPG – Sherox</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="../index.html"><span class="logo">S</span>Sherox</a>
+      <nav class="navlinks">
+        <a href="../index.html#tools">All Tools</a>
+        <a href="image-compressor.html">Compressor</a>
+        <a href="image-resizer.html">Resizer</a>
+        <a href="jpg-to-webp.html">Converters</a>
+        <a href="image-cropper.html">Cropper</a>
+      </nav>
+      <button class="menu" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <main class="tool-page">
+    <div class="container">
+      <div class="tool-header">
+        <h1>Image to JPG</h1>
+        <p>Convert PNG, WebP, GIF and other images to JPG. Choose background color for transparent areas.</p>
+      </div>
+
+      <div class="tool-layout">
+        <div class="tool-main">
+          <div class="tool-drop" id="dropzone">
+            <div class="upload-icon">↑</div>
+            <h2>Drop image here or click to upload</h2>
+            <p class="muted">PNG, WebP, GIF, JPG…</p>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <button class="btn primary" id="uploadBtn" style="margin-top:12px">Choose Image</button>
+            <div class="example-row">
+              <button type="button" class="btn example" id="exampleBtn">✨ Try an example</button>
+            </div>
+          </div>
+          <div class="tool-preview-area" id="previewArea">
+            <div class="preview-box"><img id="previewImg" alt="Preview"></div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <h3>Convert Settings</h3>
+          <div class="stats" id="stats" style="display:none">
+            <div><span class="label">Original</span><span class="value" id="origSize">—</span></div>
+            <div><span class="label">JPG size</span><span class="value" id="newSize">—</span></div>
+          </div>
+
+          <div class="control-group">
+            <label>Background color</label>
+            <input type="color" id="bgColor" value="#ffffff" style="width:100%;height:40px;border:none;border-radius:8px;cursor:pointer">
+          </div>
+
+          <div class="control-group">
+            <label>Quality: <span id="qualityVal">90</span>%</label>
+            <input type="range" id="quality" min="1" max="100" value="90">
+          </div>
+
+          <button class="btn primary btn-block" id="processBtn" disabled>Convert to JPG</button>
+          <button class="btn secondary btn-block" id="downloadBtn" disabled>Download JPG</button>
+          <button class="btn secondary btn-block" id="resetBtn">Reset</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container copyright">Developed by Sherox</div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const dropzone = document.getElementById("dropzone");
+    const previewArea = document.getElementById("previewArea");
+    const previewImg = document.getElementById("previewImg");
+    const processBtn = document.getElementById("processBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const quality = document.getElementById("quality");
+    const qualityVal = document.getElementById("qualityVal");
+    const bgColor = document.getElementById("bgColor");
+    const stats = document.getElementById("stats");
+
+    let originalFile = null, originalImg = null, resultBlob = null;
+    quality.addEventListener("input", () => qualityVal.textContent = quality.value);
+
+    function showImage(file) {
+      loadImageFromFile(file).then(img => {
+        originalFile = file; originalImg = img;
+        previewImg.src = img.src;
+        dropzone.classList.add("hidden"); previewArea.classList.add("show");
+        processBtn.disabled = false; downloadBtn.disabled = true; resultBlob = null;
+        document.getElementById("origSize").textContent = formatBytes(file.size);
+        document.getElementById("newSize").textContent = "—";
+        stats.style.display = "block";
+      }).catch(err => alert(err.message));
+    }
+
+    document.getElementById("uploadBtn").addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", e => e.target.files[0] && showImage(e.target.files[0]));
+    ["dragenter","dragover"].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.add("drag"); }));
+    ["dragleave","drop"].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.remove("drag"); }));
+    dropzone.addEventListener("drop", e => e.dataTransfer.files[0] && showImage(e.dataTransfer.files[0]));
+
+    processBtn.addEventListener("click", async () => {
+      if (!originalImg) return;
+      processBtn.disabled = true; processBtn.textContent = "Converting…";
+      const canvas = document.createElement("canvas");
+      canvas.width = originalImg.width; canvas.height = originalImg.height;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = bgColor.value;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(originalImg, 0, 0);
+      resultBlob = await canvasToBlob(canvas, "image/jpeg", quality.value / 100);
+      document.getElementById("newSize").textContent = formatBytes(resultBlob.size);
+      previewImg.src = URL.createObjectURL(resultBlob);
+      downloadBtn.disabled = false;
+      processBtn.disabled = false; processBtn.textContent = "Convert to JPG";
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!resultBlob) return;
+      downloadBlob(resultBlob, (originalFile.name.replace(/\.[^.]+$/, "") || "converted") + ".jpg");
+    });
+
+    resetBtn.addEventListener("click", () => {
+      originalFile = null; originalImg = null; resultBlob = null;
+      fileInput.value = ""; previewImg.src = "";
+      dropzone.classList.remove("hidden"); previewArea.classList.remove("show");
+      processBtn.disabled = true; downloadBtn.disabled = true; stats.style.display = "none";
+      processBtn.textContent = "Convert to JPG";
+    });
+  
+    const exampleBtn = document.getElementById("exampleBtn");
+    if (exampleBtn) {
+      exampleBtn.addEventListener("click", async () => {
+        try {
+          exampleBtn.disabled = true;
+          exampleBtn.textContent = "Loading…";
+          const file = await loadSampleAsFile("transparent");
+          showImage(file);
+        } catch (err) {
+          alert(err.message || "Could not load example");
+        } finally {
+          exampleBtn.disabled = false;
+          exampleBtn.textContent = "✨ Try an example";
+        }
+      });
+    }
+
+  </script>
+</body>
+</html>

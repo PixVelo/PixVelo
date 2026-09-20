@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Compress Image to 100KB – Sherox</title>
+  <meta name="description" content="Try to compress an image to approximately 100KB. Free browser-side tool.">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="../index.html"><span class="logo">S</span>Sherox</a>
+      <nav class="navlinks">
+        <a href="../index.html#tools">All Tools</a>
+        <a href="image-compressor.html">Compressor</a>
+        <a href="image-resizer.html">Resizer</a>
+        <a href="jpg-to-webp.html">Converters</a>
+        <a href="image-cropper.html">Cropper</a>
+      </nav>
+      <button class="menu" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <main class="tool-page">
+    <div class="container">
+      <div class="tool-header">
+        <h1>Compress Image to ~100KB</h1>
+        <p>Automatically tries to get your image close to 100KB. Exact size is not always possible without heavy quality loss.</p>
+      </div>
+
+      <div class="tool-layout">
+        <div class="tool-main">
+          <div class="tool-drop" id="dropzone">
+            <div class="upload-icon">↑</div>
+            <h2>Drop image here or click to upload</h2>
+            <p class="muted">JPG, PNG, WebP</p>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <button class="btn primary" id="uploadBtn" style="margin-top:12px">Choose Image</button>
+            <div class="example-row">
+              <button type="button" class="btn example" id="exampleBtn">✨ Try an example</button>
+            </div>
+          </div>
+          <div class="tool-preview-area" id="previewArea">
+            <div class="preview-box"><img id="previewImg" alt="Preview"></div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <h3>Target ~100KB</h3>
+          <div class="stats" id="stats" style="display:none">
+            <div><span class="label">Original</span><span class="value" id="origSize">—</span></div>
+            <div><span class="label">Result</span><span class="value" id="newSize">—</span></div>
+            <div><span class="label">Quality used</span><span class="value" id="usedQ">—</span></div>
+            <div><span class="label">Dimensions</span><span class="value" id="dims">—</span></div>
+          </div>
+
+          <div class="control-group">
+            <label>Output Format</label>
+            <select id="format">
+              <option value="image/jpeg">JPG (best for size)</option>
+              <option value="image/webp">WebP</option>
+            </select>
+          </div>
+
+          <p class="muted" style="font-size:0.85rem;margin-bottom:16px">
+            The tool binary-searches quality and may also reduce dimensions if needed. Some detailed images cannot reach 100KB without looking very compressed.
+          </p>
+
+          <button class="btn primary btn-block" id="processBtn" disabled>Compress to ~100KB</button>
+          <button class="btn secondary btn-block" id="downloadBtn" disabled>Download</button>
+          <button class="btn secondary btn-block" id="resetBtn">Reset</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container copyright">Developed by Sherox · Free browser-side image tools</div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const TARGET = 100 * 1024; // 100KB
+    const fileInput = document.getElementById("fileInput");
+    const dropzone = document.getElementById("dropzone");
+    const previewArea = document.getElementById("previewArea");
+    const previewImg = document.getElementById("previewImg");
+    const processBtn = document.getElementById("processBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const format = document.getElementById("format");
+    const stats = document.getElementById("stats");
+
+    let originalFile = null;
+    let originalImg = null;
+    let resultBlob = null;
+
+    function showImage(file) {
+      loadImageFromFile(file).then(img => {
+        originalFile = file;
+        originalImg = img;
+        previewImg.src = img.src;
+        dropzone.classList.add("hidden");
+        previewArea.classList.add("show");
+        processBtn.disabled = false;
+        downloadBtn.disabled = true;
+        resultBlob = null;
+        document.getElementById("origSize").textContent = formatBytes(file.size);
+        document.getElementById("dims").textContent = img.width + " × " + img.height;
+        document.getElementById("newSize").textContent = "—";
+        document.getElementById("usedQ").textContent = "—";
+        stats.style.display = "block";
+      }).catch(err => alert(err.message));
+    }
+
+    document.getElementById("uploadBtn").addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", e => e.target.files[0] && showImage(e.target.files[0]));
+    ["dragenter","dragover"].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.add("drag"); }));
+    ["dragleave","drop"].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); dropzone.classList.remove("drag"); }));
+    dropzone.addEventListener("drop", e => e.dataTransfer.files[0] && showImage(e.dataTransfer.files[0]));
+
+    async function tryCompress(img, w, h, type, q) {
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (type === "image/jpeg") {
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, w, h);
+      }
+      ctx.drawImage(img, 0, 0, w, h);
+      return canvasToBlob(canvas, type, q);
+    }
+
+    processBtn.addEventListener("click", async () => {
+      if (!originalImg) return;
+      processBtn.disabled = true;
+      processBtn.textContent = "Searching best quality…";
+
+      const type = format.value;
+      let w = originalImg.width;
+      let h = originalImg.height;
+      let bestBlob = null;
+      let bestQ = 0.9;
+
+      // First try quality binary search at original size
+      let low = 0.05, high = 0.95;
+      for (let i = 0; i < 10; i++) {
+        const mid = (low + high) / 2;
+        const blob = await tryCompress(originalImg, w, h, type, mid);
+        if (blob.size > TARGET) {
+          high = mid;
+        } else {
+          low = mid;
+          bestBlob = blob;
+          bestQ = mid;
+        }
+      }
+
+      // If still too big, reduce dimensions gradually
+      if (!bestBlob || bestBlob.size > TARGET * 1.15) {
+        let scale = 0.9;
+        while (scale > 0.2) {
+          const nw = Math.max(1, Math.round(originalImg.width * scale));
+          const nh = Math.max(1, Math.round(originalImg.height * scale));
+          low = 0.05; high = 0.95;
+          for (let i = 0; i < 8; i++) {
+            const mid = (low + high) / 2;
+            const blob = await tryCompress(originalImg, nw, nh, type, mid);
+            if (blob.size > TARGET) high = mid;
+            else {
+              low = mid;
+              bestBlob = blob;
+              bestQ = mid;
+              w = nw; h = nh;
+            }
+          }
+          if (bestBlob && bestBlob.size <= TARGET * 1.1) break;
+          scale -= 0.1;
+        }
+      }
+
+      if (!bestBlob) {
+        // last resort lowest quality
+        bestBlob = await tryCompress(originalImg, Math.round(originalImg.width * 0.5), Math.round(originalImg.height * 0.5), type, 0.1);
+        bestQ = 0.1;
+        w = Math.round(originalImg.width * 0.5);
+        h = Math.round(originalImg.height * 0.5);
+      }
+
+      resultBlob = bestBlob;
+      document.getElementById("newSize").textContent = formatBytes(resultBlob.size);
+      document.getElementById("usedQ").textContent = Math.round(bestQ * 100) + "%";
+      document.getElementById("dims").textContent = w + " × " + h;
+      previewImg.src = URL.createObjectURL(resultBlob);
+
+      downloadBtn.disabled = false;
+      processBtn.disabled = false;
+      processBtn.textContent = "Compress to ~100KB";
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!resultBlob) return;
+      const ext = format.value === "image/webp" ? "webp" : "jpg";
+      downloadBlob(resultBlob, (originalFile.name.replace(/\.[^.]+$/, "") || "compressed") + "_100kb." + ext);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      originalFile = null; originalImg = null; resultBlob = null;
+      fileInput.value = ""; previewImg.src = "";
+      dropzone.classList.remove("hidden"); previewArea.classList.remove("show");
+      processBtn.disabled = true; downloadBtn.disabled = true;
+      stats.style.display = "none";
+      processBtn.textContent = "Compress to ~100KB";
+    });
+  
+    const exampleBtn = document.getElementById("exampleBtn");
+    if (exampleBtn) {
+      exampleBtn.addEventListener("click", async () => {
+        try {
+          exampleBtn.disabled = true;
+          exampleBtn.textContent = "Loading…";
+          const file = await loadSampleAsFile("photo");
+          showImage(file);
+        } catch (err) {
+          alert(err.message || "Could not load example");
+        } finally {
+          exampleBtn.disabled = false;
+          exampleBtn.textContent = "✨ Try an example";
+        }
+      });
+    }
+
+  </script>
+</body>
+</html>
