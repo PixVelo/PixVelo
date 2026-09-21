@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pixvelo.github.io/PixVelo/sitemap.xml
