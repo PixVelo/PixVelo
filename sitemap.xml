@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://pixvelo.github.io/PixVelo/</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/about.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/contact.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/faq.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/privacy-policy.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/terms-of-use.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/cookie-policy.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/image-compressor.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/image-resizer.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/image-cropper.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/jpg-to-webp.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/png-to-webp.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/webp-to-jpg.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/image-to-jpg.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/compress-image-to-100kb.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/compress-image-to-200kb.html</loc></url>
-  <url><loc>https://pixvelo.github.io/PixVelo/tools/instagram-image-resizer.html</loc></url>
+
+  <url>
+    <loc>https://pixvelo.github.io/PixVelo/</loc>
+  </url>
+
+  <url>
+    <loc>https://pixvelo.github.io/PixVelo/about.html</loc>
+  </url>
+
+  <url>
+    <loc>https://pixvelo.github.io/PixVelo/contact.html</loc>
+  </url>
+
+  <url>
+    <loc>https://pixvelo.github.io/PixVelo/faq.html</loc>
+  </url>
+
+  <url>
+    <loc>https://pixvelo.github.io/PixVelo/privacy-policy.html</loc>
+  </url>
+
+  <url>
+    <loc>https://pixvelo.github.io/PixVelo/terms-of-use.html</loc>
+  </url>
+
+  <url>
+    <loc>https://pixvelo.github.io/PixVelo/cookie-policy.html</loc>
+  </url>
+
 </urlset>
