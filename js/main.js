@@ -59,7 +59,7 @@ function canvasToBlob(canvas, type = "image/jpeg", quality = 0.92) {
 // Generate example images in-memory (works with file:// — no fetch needed)
 function createSampleCanvas(key) {
   const presets = {
-    photo: { w: 1200, h: 800, c1: [30, 60, 120], c2: [200, 80, 140], label: "Sherox Sample", alpha: false },
+    photo: { w: 1200, h: 800, c1: [30, 60, 120], c2: [200, 80, 140], label: "PixVelo Sample", alpha: false },
     portrait: { w: 900, h: 1200, c1: [20, 100, 90], c2: [80, 40, 140], label: "Portrait", alpha: false },
     square: { w: 1000, h: 1000, c1: [240, 100, 50], c2: [50, 80, 200], label: "Square", alpha: false },
     landscape: { w: 1600, h: 900, c1: [15, 30, 60], c2: [100, 180, 220], label: "Landscape", alpha: false },
